@@ -1,6 +1,6 @@
 import { filter, switchMap, map, catchError } from 'rxjs/operators'
 import { from, of } from 'rxjs'
-import axios from 'axios'
+// import axios from 'axios'
 
 
 // Acions
@@ -21,19 +21,19 @@ export const loadUserFailure = id => ({ type: USER_LOAD_FAILURE })
 
 // Epics
 export const epics = {
-    list: action$ => action$
+    list: (action$, state$, { getJSON}) => action$
         .pipe(filter(action => action.type === LIST_LOAD))
         .pipe(switchMap(() =>
-            from(axios.get('https://api.github.com/users?per_page=4'))
+            from(getJSON.get('https://api.github.com/users?per_page=4'))
                 .pipe(map(response => response.data))
         ))
         .pipe(map(loadUsersSuccess))
         .pipe(catchError(() => of(loadUsersFailure()))),
- 
-    user: action$ => action$
+
+    user: (action$, state$, { getJSON }) => action$
         .pipe(filter(action => action.type === USER_LOAD))
         .pipe(switchMap(({ payload }) =>
-            from(axios.get(`https://api.github.com/user/${payload.id}`))
+            from(getJSON.get(`https://api.github.com/user/${payload.id}`))
                 .pipe(map(response => response.data))
         ))
         .pipe(map(loadUserSuccess))
